@@ -1,0 +1,24 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Specify Vagrant version and Vagrant API version
+Vagrant.require_version ">= 2.0"
+VAGRANTFILE_API_VERSION = "2"
+
+# Create and configure the Docker container(s)
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  ###
+  # Development box.
+  #
+  config.vm.define "server-dev" do |node|
+    node.vm.box = "ubuntu/focal64"
+    node.vm.hostname = "server-dev"
+    node.vm.synced_folder "./..", "/vagrant"
+    node.vm.provision :shell, path: "./setup/provision.sh"
+    node.vm.network "private_network", ip: "172.16.3.13"
+	  node.vm.network "forwarded_port", guest: 8080, host: 8080
+    node.vm.provider "virtualbox" do |vb|
+      vb.memory = 2048
+    end
+  end
+end
